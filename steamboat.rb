@@ -22,17 +22,17 @@ class Steamboat
 
     # Sign in
 
-    driver.find_element(:id, "SignIn").click
+    # driver.find_element(:id, "SignIn").click
 
-    wait_short.until { driver.title.downcase.start_with? "account" }
+    # wait_short.until { driver.title.downcase.start_with? "account" }
 
-    email_field = driver.find_element(:id, "MainContentPlaceHolder_Login1_UserName")
-    pword_field = driver.find_element(:id, "MainContentPlaceHolder_Login1_Password")
-    email_field.send_keys EMAIL
-    pword_field.send_keys PWORD
-    driver.find_element(:id, "MainContentPlaceHolder_Login1_Login").click
+    # email_field = driver.find_element(:id, "MainContentPlaceHolder_Login1_UserName")
+    # pword_field = driver.find_element(:id, "MainContentPlaceHolder_Login1_Password")
+    # email_field.send_keys EMAIL
+    # pword_field.send_keys PWORD
+    # driver.find_element(:id, "MainContentPlaceHolder_Login1_Login").click
 
-    wait_short.until { driver.title.downcase.start_with? "find a site" }
+    # wait_short.until { driver.title.downcase.start_with? "find a site" }
 
     # Section 2
 
@@ -66,7 +66,7 @@ class Steamboat
 
     puts "Instance #{instance_number + 1} waiting for go-time #{go_time.strftime("%H:%M:%S.%L")}"
     while Time.now < go_time do
-      # nothing
+      sleep 0.05
     end
 
     puts "Instance #{instance_number + 1} firing at #{Time.now.strftime("%H:%M:%S.%L")}"
@@ -80,9 +80,10 @@ class Steamboat
 
 end
 
-go_time = Time.parse "2018-10-20 06:59:57.000 -0700"
+go_time = Time.parse "2018-10-21 06:59:55.000 -0700"
 
-20.times do |index|
+75.times do |index|
   go_time = go_time + 0.1
   fork { Steamboat.new.reserve(go_time, index) }
+  sleep 2
 end
