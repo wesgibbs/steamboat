@@ -44,8 +44,8 @@ class Steamboat
 
     Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "MainContentPlaceHolder_LocationList")).select_by(:text, "Steamboat Rock State Park")
     wait_long.until { driver.find_element(:id, "MainContentPlaceHolder_MapList").enabled? }
-    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "MainContentPlaceHolder_MapList")).select_by(:text, "Sage Loop (1-50, 301-312)")
-    # Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "MainContentPlaceHolder_MapList")).select_by(:text, "Dune Loop (51-100, 313-326)")
+    # Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "MainContentPlaceHolder_MapList")).select_by(:text, "Sage Loop (1-50, 301-312)")
+    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "MainContentPlaceHolder_MapList")).select_by(:text, "Dune Loop (51-100, 313-326)")
 
     # Section 4
 
@@ -83,6 +83,6 @@ end
 go_time = Time.parse "2018-10-20 06:59:57.000 -0700"
 
 20.times do |index|
-  go_time = go_time + 0.01
+  go_time = go_time + 0.1
   fork { Steamboat.new.reserve(go_time, index) }
 end
