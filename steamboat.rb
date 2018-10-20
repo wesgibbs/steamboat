@@ -5,7 +5,7 @@ require 'time'
 class Steamboat
 
   EMAIL = "wes.signups@gmail.com"
-  PWORD = "katyisflawlessomgiamsolucky"
+  PWORD = ""
 
   attr_accessor :driver, :site, :tent, :wait_long, :wait_short
 
@@ -17,7 +17,7 @@ class Steamboat
     self.wait_short = Selenium::WebDriver::Wait.new(:timeout => 5)
   end
 
-  def reserve(go_time)
+  def reserve(go_time, instance_number)
     driver.get "https://washington.goingtocamp.com/SteamboatRockStatePark?Map"
 
     # Sign in
@@ -64,10 +64,12 @@ class Steamboat
 
     wait_long.until { driver.find_element(:id, "reserveButton").enabled? }
 
-    puts "Waiting for go-time #{go_time.strftime("%H:%M:%S.%L")}"
+    puts "Instance #{instance_number + 1} waiting for go-time #{go_time.strftime("%H:%M:%S.%L")}"
     while Time.now < go_time do
       # nothing
     end
+
+    puts "Instance #{instance_number + 1} firing at #{Time.now.strftime("%H:%M:%S.%L")}"
 
     driver.find_element(:id, "reserveButton").click
 
@@ -78,9 +80,9 @@ class Steamboat
 
 end
 
-go_time = Time.parse "2018-10-20 06:59:59.900 -0700"
+go_time = Time.parse "2018-10-20 06:59:57.000 -0700"
 
-20.times do
+20.times do |index|
   go_time = go_time + 0.01
-  fork { Steamboat.new.reserve(go_time) }
+  fork { Steamboat.new.reserve(go_time, index) }
 end
