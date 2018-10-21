@@ -4,35 +4,17 @@ require 'time'
 
 class Steamboat
 
-  EMAIL = "wes.signups@gmail.com"
-  PWORD = ""
-
-  attr_accessor :driver, :site, :tent, :wait_long, :wait_short
+  attr_accessor :driver, :site, :tent, :wait_long
 
   def initialize
     self.driver = Selenium::WebDriver.for :chrome
     self.site = ARGV[0]
     self.tent = ARGV[1]
     self.wait_long = Selenium::WebDriver::Wait.new(:timeout => 900)
-    self.wait_short = Selenium::WebDriver::Wait.new(:timeout => 5)
   end
 
   def reserve(go_time, instance_number)
     driver.get "https://washington.goingtocamp.com/SteamboatRockStatePark?Map"
-
-    # Sign in
-
-    # driver.find_element(:id, "SignIn").click
-
-    # wait_short.until { driver.title.downcase.start_with? "account" }
-
-    # email_field = driver.find_element(:id, "MainContentPlaceHolder_Login1_UserName")
-    # pword_field = driver.find_element(:id, "MainContentPlaceHolder_Login1_Password")
-    # email_field.send_keys EMAIL
-    # pword_field.send_keys PWORD
-    # driver.find_element(:id, "MainContentPlaceHolder_Login1_Login").click
-
-    # wait_short.until { driver.title.downcase.start_with? "find a site" }
 
     # Section 2
 
