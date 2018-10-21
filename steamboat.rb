@@ -37,7 +37,7 @@ class Steamboat
     # Section 2
 
     Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrMth")).select_by(:text, "Jul")
-    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrDay")).select_by(:text, "20th")
+    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrDay")).select_by(:text, "21st")
     Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selNumNights")).select_by(:text, "3")
 
     # Section 3
@@ -66,7 +66,7 @@ class Steamboat
 
     puts "Instance #{instance_number + 1} waiting for go-time #{go_time.strftime("%H:%M:%S.%L")}"
     while Time.now < go_time do
-      sleep 0.05
+      sleep 0.025
     end
 
     puts "Instance #{instance_number + 1} firing at #{Time.now.strftime("%H:%M:%S.%L")}"
@@ -80,10 +80,10 @@ class Steamboat
 
 end
 
-go_time = Time.parse "2018-10-21 06:59:55.000 -0700"
+go_time = Time.parse "2018-10-22 06:59:55.011 -0700"
 
 75.times do |index|
-  go_time = go_time + 0.1
+  go_time = go_time + 0.04
   fork { Steamboat.new.reserve(go_time, index) }
   sleep 2
 end
