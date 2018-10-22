@@ -4,16 +4,17 @@ require 'time'
 
 class Steamboat
 
-  attr_accessor :driver, :site, :tent, :wait_long
+  attr_accessor :driver, :instance_number, :site, :tent, :wait_long
 
-  def initialize
+  def initialize(instance_number)
     self.driver = Selenium::WebDriver.for :chrome
+    self.instance_number = instance_number
     self.site = ARGV[0]
     self.tent = ARGV[1]
-    self.wait_long = Selenium::WebDriver::Wait.new(:timeout => 1800)
+    self.wait_long = Selenium::WebDriver::Wait.new(:timeout => 1800) # 30 minutes
   end
 
-  def reserve(go_time, instance_number)
+  def prepare
     driver.get "https://washington.goingtocamp.com/SteamboatRockStatePark?Map"
 
     # Section 2
@@ -46,26 +47,35 @@ class Steamboat
 
     wait_long.until { driver.find_element(:id, "reserveButton").enabled? }
 
-    puts "Instance #{instance_number + 1} waiting for go-time #{go_time.strftime("%H:%M:%S.%L")}"
-    while Time.now < go_time do
-      sleep 0.04
-    end
+    puts "Instance #{instance_number} ready"
+  end
 
-    puts "Instance #{instance_number + 1} firing at #{Time.now.strftime("%H:%M:%S.%L")}"
-
+  def reserve
     driver.find_element(:id, "reserveButton").click
-
     wait_long.until { driver.title.downcase.start_with? "never gonna happen" }
-
-    driver.quit
   end
 
 end
 
-go_time = Time.parse "2018-10-23 06:59:55.011 -0700"
+steamboats = Array.new(3) do |instance_number|
+  Steamboat.new(instance_number + 1)
+end
 
-125.times do |index|
-  go_time = go_time + 0.04
-  fork { Steamboat.new.reserve(go_time, index) }
+steamboats.each do |steamboat|
+  fork { steamboat.prepare }
   sleep 3
 end
+
+go_time = Time.parse "2018-10-22 13:37:01.001 -0700"
+
+while Time.now < go_time do
+  sleep 0.005
+end
+
+steamboats.each do |steamboat|
+  puts "Instance #{steamboat.instance_number} firing at #{Time.now.strftime("%H:%M:%S.%L")}"
+  fork { steamboat.reserve }
+  sleep 0.02
+end
+
+sleep 60 * 30 # 30 minutes
