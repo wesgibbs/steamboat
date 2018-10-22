@@ -10,7 +10,7 @@ class Steamboat
     self.driver = Selenium::WebDriver.for :chrome
     self.site = ARGV[0]
     self.tent = ARGV[1]
-    self.wait_long = Selenium::WebDriver::Wait.new(:timeout => 900)
+    self.wait_long = Selenium::WebDriver::Wait.new(:timeout => 1800)
   end
 
   def reserve(go_time, instance_number)
@@ -19,7 +19,7 @@ class Steamboat
     # Section 2
 
     Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrMth")).select_by(:text, "Jul")
-    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrDay")).select_by(:text, "21st")
+    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrDay")).select_by(:text, "22nd")
     Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selNumNights")).select_by(:text, "3")
 
     # Section 3
@@ -48,7 +48,7 @@ class Steamboat
 
     puts "Instance #{instance_number + 1} waiting for go-time #{go_time.strftime("%H:%M:%S.%L")}"
     while Time.now < go_time do
-      sleep 0.025
+      sleep 0.04
     end
 
     puts "Instance #{instance_number + 1} firing at #{Time.now.strftime("%H:%M:%S.%L")}"
@@ -62,10 +62,10 @@ class Steamboat
 
 end
 
-go_time = Time.parse "2018-10-22 06:59:55.011 -0700"
+go_time = Time.parse "2018-10-23 06:59:55.011 -0700"
 
-75.times do |index|
+125.times do |index|
   go_time = go_time + 0.04
   fork { Steamboat.new.reserve(go_time, index) }
-  sleep 2
+  sleep 3
 end
