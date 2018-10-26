@@ -4,23 +4,30 @@ require 'time'
 
 class Steamboat
 
-  attr_accessor :driver, :instance_number, :site, :tent, :wait_long
+  NUMBER_OF_INSTANCES = 70
 
-  def initialize(instance_number)
-    self.driver = Selenium::WebDriver.for :chrome
+  attr_accessor :driver, :instance_number, :site, :tab, :tent, :wait_long
+
+  def initialize(driver, instance_number, tab)
+    self.driver = driver
     self.instance_number = instance_number
     self.site = ARGV[0]
+    self.tab = tab
     self.tent = ARGV[1]
     self.wait_long = Selenium::WebDriver::Wait.new(:timeout => 1800) # 30 minutes
   end
 
-  def prepare
-    driver.get "https://washington.goingtocamp.com/SteamboatRockStatePark?Map"
+  def navigate
+    driver.switch_to.window(tab)
+    # driver.get "https://washington.goingtocamp.com/SteamboatRockStatePark/SageLoop(1-50,301-312)?Map"
+    driver.get "https://washington.goingtocamp.com/SteamboatRockStatePark/DuneLoop(51-100,313-326)?Map"
+  end
 
+  def fill_out_form
     # Section 2
 
     Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrMth")).select_by(:text, "Jul")
-    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrDay")).select_by(:text, "22nd")
+    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrDay")).select_by(:text, "29th")
     Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selNumNights")).select_by(:text, "3")
 
     # Section 3
@@ -36,46 +43,60 @@ class Steamboat
     if tent == "tent"
       Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selEquipmentSub")).select_by(:text, "Tent")
     else
-      Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selEquipmentSub")).select_by(:value, "Sm Trailer up to 18ft")
+      Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selEquipmentSub")).select_by(:value, "Lg Trailer/Motorhome 18-32ft")
     end
 
     wait_long.until { driver.find_element(:id, "selPartySize").enabled? }
-    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selPartySize")).select_by(:value, "3")
+    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selPartySize")).select_by(:value, "5")
 
     wait_long.until { driver.find_element(:id, "selResource").enabled? }
     Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selResource")).select_by(:text, site)
-
-    wait_long.until { driver.find_element(:id, "reserveButton").enabled? }
-
-    puts "Instance #{instance_number} ready"
   end
 
   def reserve
-    driver.find_element(:id, "reserveButton").click
-    wait_long.until { driver.title.downcase.start_with? "never gonna happen" }
+    driver.switch_to.window(tab)
+    erroring = true
+    while erroring do
+      begin
+        wait_long.until { driver.find_element(:id, "reserveButton").enabled? } # rceDetailLink
+        driver.find_element(:id, "reserveButton").click
+        puts "Instance #{instance_number} succeeded at #{Time.now.strftime("%H:%M:%S.%L")}"
+        erroring = false
+      rescue Selenium::WebDriver::Error::StaleElementReferenceError
+        puts "Instance #{instance_number} re-clicking..."
+      end
+    end
+    # wait_long.until { driver.title.downcase.start_with? "never gonna happen" }
   end
 
 end
 
-steamboats = Array.new(3) do |instance_number|
-  Steamboat.new(instance_number + 1)
+go_time = Time.parse "2018-10-29 06:59:55.001 -0700"
+start = Time.now
+driver = Selenium::WebDriver.for(:chrome)
+steamboats = []
+
+Steamboat::NUMBER_OF_INSTANCES.times do |index|
+  instance_number = index + 1
+  tab = driver.window_handles.last
+  steamboat = Steamboat.new(driver, instance_number, tab)
+  steamboats << steamboat
+  steamboat.navigate
+  steamboat.fill_out_form if instance_number == 1
+  puts "Instance #{instance_number} ready"
+  driver.execute_script("window.open()") unless index == Steamboat::NUMBER_OF_INSTANCES - 1
 end
 
-steamboats.each do |steamboat|
-  fork { steamboat.prepare }
-  sleep 3
-end
-
-go_time = Time.parse "2018-10-22 13:37:01.001 -0700"
+puts "Set up complete: #{Time.at(Time.now - start).strftime("%M:%S")}"
 
 while Time.now < go_time do
   sleep 0.005
 end
 
 steamboats.each do |steamboat|
-  puts "Instance #{steamboat.instance_number} firing at #{Time.now.strftime("%H:%M:%S.%L")}"
-  fork { steamboat.reserve }
-  sleep 0.02
+  steamboat.reserve
 end
 
-sleep 60 * 30 # 30 minutes
+binding.pry
+
+driver.quit
