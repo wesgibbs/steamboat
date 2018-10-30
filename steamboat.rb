@@ -27,7 +27,7 @@ class Steamboat
     # Section 2
 
     Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrMth")).select_by(:text, "Jul")
-    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrDay")).select_by(:text, "29th")
+    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrDay")).select_by(:text, ordinal_day_of_month)
     Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selNumNights")).select_by(:text, "3")
 
     # Section 3
@@ -58,7 +58,7 @@ class Steamboat
     erroring = true
     while erroring do
       begin
-        wait_long.until { driver.find_element(:id, "reserveButton").enabled? } # rceDetailLink
+        wait_long.until { driver.find_element(:id, "reserveButton").enabled? } # reserveButton rceDetailLink
         driver.find_element(:id, "reserveButton").click
         puts "Instance #{instance_number} succeeded at #{Time.now.strftime("%H:%M:%S.%L")}"
         erroring = false
@@ -69,9 +69,28 @@ class Steamboat
     # wait_long.until { driver.title.downcase.start_with? "never gonna happen" }
   end
 
+  private
+
+  def ordinal_day_of_month
+    number = Date.today.strftime("%d")
+    abs_number = number.to_i.abs
+
+    ordinal = if (11..13).include?(abs_number % 100)
+      "th"
+    else
+      case abs_number % 10
+        when 1; "st"
+        when 2; "nd"
+        when 3; "rd"
+        else    "th"
+      end
+    end
+    "#{number}#{ordinal}"
+  end
+
 end
 
-go_time = Time.parse "2018-10-29 06:59:55.001 -0700"
+go_time = Time.parse("#{Date.today.to_s} 06:59:55.001 -0700")
 start = Time.now
 driver = Selenium::WebDriver.for(:chrome)
 steamboats = []
@@ -88,6 +107,7 @@ Steamboat::NUMBER_OF_INSTANCES.times do |index|
 end
 
 puts "Set up complete: #{Time.at(Time.now - start).strftime("%M:%S")}"
+puts "Waiting for go time: #{go_time}"
 
 while Time.now < go_time do
   sleep 0.005
