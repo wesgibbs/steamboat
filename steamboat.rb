@@ -6,12 +6,13 @@ class Steamboat
 
   NUMBER_OF_INSTANCES = 70
 
-  attr_accessor :driver, :instance_number, :site, :tab, :tent, :wait_long
+  attr_accessor :campground, :driver, :instance_number, :site, :tab, :tent, :wait_long
 
   def initialize(driver, instance_number, tab)
+    self.campground = ARGV[0]
     self.driver = driver
     self.instance_number = instance_number
-    self.site = ARGV[0]
+    self.site = ARGV[2]
     self.tab = tab
     self.tent = ARGV[1]
     self.wait_long = Selenium::WebDriver::Wait.new(:timeout => 1800) # 30 minutes
@@ -19,8 +20,11 @@ class Steamboat
 
   def navigate
     driver.switch_to.window(tab)
-    # driver.get "https://washington.goingtocamp.com/SteamboatRockStatePark/SageLoop(1-50,301-312)?Map"
-    driver.get "https://washington.goingtocamp.com/SteamboatRockStatePark/DuneLoop(51-100,313-326)?Map"
+    if campground.downcase == "sage"
+      driver.get "https://washington.goingtocamp.com/SteamboatRockStatePark/SageLoop(1-50,301-312)?Map"
+    else
+      driver.get "https://washington.goingtocamp.com/SteamboatRockStatePark/DuneLoop(51-100,313-326)?Map"
+    end
   end
 
   def fill_out_form
@@ -34,13 +38,16 @@ class Steamboat
 
     Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "MainContentPlaceHolder_LocationList")).select_by(:text, "Steamboat Rock State Park")
     wait_long.until { driver.find_element(:id, "MainContentPlaceHolder_MapList").enabled? }
-    # Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "MainContentPlaceHolder_MapList")).select_by(:text, "Sage Loop (1-50, 301-312)")
-    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "MainContentPlaceHolder_MapList")).select_by(:text, "Dune Loop (51-100, 313-326)")
+    if campground.downcase == "sage"
+      Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "MainContentPlaceHolder_MapList")).select_by(:text, "Sage Loop (1-50, 301-312)")
+    else
+      Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "MainContentPlaceHolder_MapList")).select_by(:text, "Dune Loop (51-100, 313-326)")
+    end
 
     # Section 4
 
     wait_long.until { driver.find_element(:id, "selEquipmentSub").enabled? }
-    if tent == "tent"
+    if tent.downcase == "tent"
       Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selEquipmentSub")).select_by(:text, "Tent")
     else
       Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selEquipmentSub")).select_by(:value, "Lg Trailer/Motorhome 18-32ft")
