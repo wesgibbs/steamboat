@@ -1,3 +1,13 @@
+# Will launch one browser window, do the navigation and form completion. Next
+# it will launch NUMBER_OF_INSTANCES tabs, each one with the completed form
+# (because the form details are in the session). Then it will wait until the
+# `go_time` to click the Reserve button as fast as the processor and Selenium
+# can iterate through the tabs.
+#
+# Invocation:
+#   bundle exec ruby ./steamboat.rb dune camper 83
+#   bundle exec ruby ./steamboat.rb sage tent 312
+
 require 'pry-byebug'
 require 'selenium-webdriver'
 require 'time'
