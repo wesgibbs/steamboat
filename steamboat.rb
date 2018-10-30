@@ -7,6 +7,7 @@
 # Invocation:
 #   bundle exec ruby ./steamboat.rb dune camper 83
 #   bundle exec ruby ./steamboat.rb sage tent 312
+#   bundle exec ruby ./steamboat.rb sage camper 23 test
 
 require 'pry-byebug'
 require 'selenium-webdriver'
@@ -16,7 +17,7 @@ class Steamboat
 
   NUMBER_OF_INSTANCES = 70
 
-  attr_accessor :campground, :driver, :instance_number, :site, :tab, :tent, :wait_long
+  attr_accessor :campground, :driver, :instance_number, :site, :tab, :tent, :test_run, :wait_long
 
   def initialize(driver, instance_number, tab)
     self.campground = ARGV[0]
@@ -25,6 +26,7 @@ class Steamboat
     self.site = ARGV[2]
     self.tab = tab
     self.tent = ARGV[1]
+    self.test_run = ARGV[3]
     self.wait_long = Selenium::WebDriver::Wait.new(:timeout => 1800) # 30 minutes
   end
 
@@ -75,8 +77,8 @@ class Steamboat
     erroring = true
     while erroring do
       begin
-        wait_long.until { driver.find_element(:id, "reserveButton").enabled? } # reserveButton rceDetailLink
-        driver.find_element(:id, "reserveButton").click
+        wait_long.until { driver.find_element(:id, reserve_or_details).enabled? }
+        driver.find_element(:id, reserve_or_details).click
         puts "Instance #{instance_number} succeeded at #{Time.now.strftime("%H:%M:%S.%L")}"
         erroring = false
       rescue Selenium::WebDriver::Error::StaleElementReferenceError
@@ -103,6 +105,10 @@ class Steamboat
       end
     end
     "#{number}#{ordinal}"
+  end
+
+  def reserve_or_details
+    test_run.downcase == "test" ? "rceDetailLink" : "reserveButton"
   end
 
 end
