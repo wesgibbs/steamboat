@@ -85,7 +85,6 @@ class Steamboat
         puts "Instance #{instance_number} re-clicking..."
       end
     end
-    # wait_long.until { driver.title.downcase.start_with? "never gonna happen" }
   end
 
   private
