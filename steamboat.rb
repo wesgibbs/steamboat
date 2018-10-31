@@ -26,7 +26,7 @@ class Steamboat
     self.site = ARGV[2]
     self.tab = tab
     self.tent = ARGV[1]
-    self.test_run = ARGV[3]
+    self.test_run = ARGV[3] || ""
     self.wait_long = Selenium::WebDriver::Wait.new(:timeout => 1800) # 30 minutes
   end
 
