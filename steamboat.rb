@@ -90,7 +90,7 @@ class Steamboat
   private
 
   def ordinal_day_of_month
-    number = Date.today.strftime("%d")
+    number = Date.today.strftime("%-d")
     abs_number = number.to_i.abs
 
     ordinal = if (11..13).include?(abs_number % 100)
