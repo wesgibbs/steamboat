@@ -9,6 +9,7 @@
 #   bundle exec ruby ./steamboat.rb sage tent 312
 #   bundle exec ruby ./steamboat.rb sage camper 23 test
 
+require 'active_support/time'
 require 'pry-byebug'
 require 'selenium-webdriver'
 require 'time'
@@ -42,7 +43,7 @@ class Steamboat
   def fill_out_form
     # Section 2
 
-    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrMth")).select_by(:text, "Jul")
+    Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrMth")).select_by(:text, abbreviated_month)
     Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selArrDay")).select_by(:text, ordinal_day_of_month)
     Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "selNumNights")).select_by(:text, "3")
 
@@ -88,6 +89,10 @@ class Steamboat
   end
 
   private
+
+  def abbreviated_month
+    (Date.today + 9.months).strftime("%b")
+  end
 
   def ordinal_day_of_month
     number = Date.today.strftime("%-d")
