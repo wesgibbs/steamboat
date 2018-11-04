@@ -112,7 +112,7 @@ class Steamboat
 
 end
 
-go_time = Time.parse("#{Date.today.to_s} 06:59:55.001 -0700")
+go_time = Time.parse("#{Date.today.to_s} 06:59:55.001")
 start = Time.now
 driver = Selenium::WebDriver.for(:chrome)
 steamboats = []
