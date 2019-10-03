@@ -31,14 +31,21 @@ class Steamboat
   end
 
   def navigate
-    driver.switch_to.window(tab)
-    map_id = campground.downcase == "sage" ? "-2147483552" : "-2147483489"
-    driver.get "https://washington.goingtocamp.com/create-booking/results?resourceLocationId=-2147483552&mapId=#{map_id}&searchTabGroupId=0&bookingCategoryId=0&startDate=2020-#{start_date.strftime("%m")}-#{start_date.strftime("%d")}T00:00:00.000Z&endDate=2020-#{end_date.strftime("%m")}-#{end_date.strftime("%d")}T00:00:00.000Z&nights=#{NUMBER_OF_NIGHTS}&isReserving=true&equipmentId=-32768&subEquipmentId=-32759&partySize=5"
+    begin
+      driver.switch_to.window(tab)
+      map_id = campground.downcase == "sage" ? "-2147483552" : "-2147483489"
+      driver.get "https://washington.goingtocamp.com/create-booking/results?resourceLocationId=-2147483552&mapId=#{map_id}&searchTabGroupId=0&bookingCategoryId=0&startDate=2020-#{start_date.strftime("%m")}-#{start_date.strftime("%d")}T00:00:00.000Z&endDate=2020-#{end_date.strftime("%m")}-#{end_date.strftime("%d")}T00:00:00.000Z&nights=#{NUMBER_OF_NIGHTS}&isReserving=true&equipmentId=-32768&subEquipmentId=-32759&partySize=5"
 
-    wait_long.until { driver.find_element(:xpath, "//*[text()='#{site}']").enabled? }
-    element = driver.find_element(:xpath, "//*[text()='#{site}']")
-    driver.execute_script("arguments[0].scrollIntoView();",element)
-    element.click
+      wait_long.until { driver.find_element(:xpath, "//*[text()='#{site}']").enabled? }
+      element = driver.find_element(:xpath, "//*[text()='#{site}']")
+      driver.execute_script("arguments[0].scrollIntoView();",element)
+
+      element.click
+      true
+    rescue StandardError => e
+      puts "Instance #{instance_number} failed to initialize. #{e.message}"
+      false
+    end
   end
 
   def reserve
@@ -46,7 +53,6 @@ class Steamboat
     erroring = true
     while erroring do
       begin
-        wait_long.until { driver.find_element(:xpath, "//span[text()='#{reserve_or_details}']").enabled? }
         driver.find_element(:xpath, "//span[text()='#{reserve_or_details}']").find_element(:xpath, "..").click
         puts "Instance #{instance_number} succeeded at #{Time.now.strftime("%H:%M:%S.%L")}"
         erroring = false
@@ -59,15 +65,15 @@ class Steamboat
   private
 
   def end_date
-    start_date + NUMBER_OF_NIGHTS.days
+    @end_date ||= start_date + NUMBER_OF_NIGHTS.days
   end
 
   def reserve_or_details
-    test_run.downcase == "test" ? "View More Details" : "Reserve"
+    @reserve_or_details ||= test_run.downcase == "test" ? "View More Details" : "Reserve"
   end
 
   def start_date
-    Date.today + 9.months
+    @start_date ||= Date.today + 9.months
   end
 
 end
@@ -81,9 +87,10 @@ Steamboat::NUMBER_OF_TABS.times do |index|
   instance_number = index + 1
   tab = driver.window_handles.last
   steamboat = Steamboat.new(driver, instance_number, tab)
-  steamboats << steamboat
-  steamboat.navigate
-  puts "Instance #{instance_number} ready"
+  if steamboat.navigate
+    steamboats << steamboat
+    puts "Instance #{instance_number} ready"
+  end
   driver.execute_script("window.open()") unless index == Steamboat::NUMBER_OF_TABS - 1
 end
 
