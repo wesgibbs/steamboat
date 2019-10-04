@@ -34,7 +34,7 @@ class Steamboat
     begin
       driver.switch_to.window(tab)
       map_id = campground.downcase == "sage" ? "-2147483552" : "-2147483489"
-      driver.get "https://washington.goingtocamp.com/create-booking/results?resourceLocationId=-2147483552&mapId=#{map_id}&searchTabGroupId=0&bookingCategoryId=0&startDate=2020-#{start_date.strftime("%m")}-#{start_date.strftime("%d")}T00:00:00.000Z&endDate=2020-#{end_date.strftime("%m")}-#{end_date.strftime("%d")}T00:00:00.000Z&nights=#{NUMBER_OF_NIGHTS}&isReserving=true&equipmentId=-32768&subEquipmentId=-32759&partySize=5"
+      driver.get "https://washington.goingtocamp.com/create-booking/results?resourceLocationId=-2147483552&mapId=#{map_id}&searchTabGroupId=0&bookingCategoryId=0&startDate=2020-#{start_date.strftime("%m")}-#{start_date.strftime("%d")}T00:00:00.000Z&endDate=2020-#{end_date.strftime("%m")}-#{end_date.strftime("%d")}T00:00:00.000Z&nights=#{NUMBER_OF_NIGHTS}&isReserving=true&equipmentId=-32768&subEquipmentId=-32762&partySize=5"
 
       wait_long.until { driver.find_element(:xpath, "//*[text()='#{site}']").enabled? }
       element = driver.find_element(:xpath, "//*[text()='#{site}']")
