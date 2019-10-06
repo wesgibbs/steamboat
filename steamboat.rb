@@ -107,9 +107,10 @@ while Time.now < go_time do
   sleep 0.005
 end
 
-binding.pry
 steamboats.each do |steamboat|
   steamboat.reserve
 end
+
+binding.pry
 
 driver.quit
