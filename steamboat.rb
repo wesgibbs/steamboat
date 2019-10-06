@@ -15,7 +15,7 @@ require 'time'
 
 class Steamboat
 
-  NUMBER_OF_TABS = 70
+  NUMBER_OF_TABS = 22
   NUMBER_OF_NIGHTS = 5
 
   attr_accessor :campground, :driver, :instance_number, :site, :tab, :test_run, :wait_long
@@ -35,6 +35,12 @@ class Steamboat
       driver.switch_to.window(tab)
       map_id = campground.downcase == "sage" ? "-2147483552" : "-2147483489"
       driver.get "https://washington.goingtocamp.com/create-booking/results?resourceLocationId=-2147483552&mapId=#{map_id}&searchTabGroupId=0&bookingCategoryId=0&startDate=2020-#{start_date.strftime("%m")}-#{start_date.strftime("%d")}T00:00:00.000Z&endDate=2020-#{end_date.strftime("%m")}-#{end_date.strftime("%d")}T00:00:00.000Z&nights=#{NUMBER_OF_NIGHTS}&isReserving=true&equipmentId=-32768&subEquipmentId=-32762&partySize=5"
+
+      # Dismiss the cookie acceptance overlay
+      if instance_number == 1
+        wait_long.until { driver.find_element(:id, "consentButton").enabled? }
+        driver.find_element(:id, "consentButton").click
+      end
 
       wait_long.until { driver.find_element(:xpath, "//*[text()='#{site}']").enabled? }
       element = driver.find_element(:xpath, "//*[text()='#{site}']")
@@ -78,7 +84,7 @@ class Steamboat
 
 end
 
-go_time = Time.parse("#{Date.today.to_s} 06:59:55.001")
+go_time = Time.parse("#{Date.today.to_s} 06:59:56.001")
 start = Time.now
 driver = Selenium::WebDriver.for(:chrome)
 steamboats = []
@@ -101,10 +107,9 @@ while Time.now < go_time do
   sleep 0.005
 end
 
+binding.pry
 steamboats.each do |steamboat|
   steamboat.reserve
 end
-
-binding.pry
 
 driver.quit
