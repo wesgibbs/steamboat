@@ -7,6 +7,18 @@
 #   bundle exec ruby ./steamboat.rb dune 83
 #   bundle exec ruby ./steamboat.rb sage 312
 #   bundle exec ruby ./steamboat.rb sage 23 test
+#
+# Last successfully ran on 2019-10-06. I ran the script on two computers. Each
+# computer ran 22 tabs. Computer 1 had a start time of 06:59:56.001. Computer 2
+# had a start time of 06:59:56.251. Each computer managed to process 2 - 3 tabs
+# per second when it was go-time. These were the times reported by the tab that
+# was the last one too soon (10), and the one that secured the site (11):
+#   Instance 10 succeeded at 06:59:59.734
+#   Instance 11 succeeded at 07:00:00.080
+# These are the times reported by computer 2 which failed to get the site.
+# Instance 7 was too soon, instance 8 was too late.
+#   Instance 7 succeeded at 06:59:59.713
+#   Instance 8 succeeded at 07:00:00.123
 
 require 'active_support/time'
 require 'pry-byebug'
