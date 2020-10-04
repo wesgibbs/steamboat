@@ -46,7 +46,8 @@ class Steamboat
     begin
       driver.switch_to.window(tab)
       map_id = campground.downcase == "sage" ? "-2147483552" : "-2147483489"
-      driver.get "https://washington.goingtocamp.com/create-booking/results?resourceLocationId=-2147483552&mapId=#{map_id}&searchTabGroupId=0&bookingCategoryId=0&startDate=2020-#{start_date.strftime("%m")}-#{start_date.strftime("%d")}T00:00:00.000Z&endDate=2020-#{end_date.strftime("%m")}-#{end_date.strftime("%d")}T00:00:00.000Z&nights=#{NUMBER_OF_NIGHTS}&isReserving=true&equipmentId=-32768&subEquipmentId=-32762&partySize=5"
+      the_url = "https://washington.goingtocamp.com/create-booking/results?resourceLocationId=-2147483552&mapId=#{map_id}&searchTabGroupId=0&bookingCategoryId=0&startDate=2021-#{start_date.strftime("%m")}-#{start_date.strftime("%d")}T00:00:00.000Z&endDate=2021-#{end_date.strftime("%m")}-#{end_date.strftime("%d")}T00:00:00.000Z&nights=#{NUMBER_OF_NIGHTS}&isReserving=true&equipmentId=-32768&subEquipmentId=-32762&partySize=5"
+      driver.get the_url
 
       # Dismiss the cookie acceptance overlay
       if instance_number == 1
@@ -58,7 +59,8 @@ class Steamboat
       element = driver.find_element(:xpath, "//*[text()='#{site}']")
       driver.execute_script("arguments[0].scrollIntoView();",element)
 
-      element.click
+      driver.action.click(element).perform
+      wait_long.until { driver.find_element(:xpath, "//span[text()='Reserve']").enabled? }
       true
     rescue StandardError => e
       puts "Instance #{instance_number} failed to initialize. #{e.message}"
@@ -71,7 +73,8 @@ class Steamboat
     erroring = true
     while erroring do
       begin
-        driver.find_element(:xpath, "//span[text()='#{reserve_or_details}']").find_element(:xpath, "..").click
+        element = driver.find_element(:xpath, "//span[text()='#{reserve_or_details}']").find_element(:xpath, "..")
+        driver.action.click(element).perform
         puts "Instance #{instance_number} succeeded at #{Time.now.strftime("%H:%M:%S.%L")}"
         erroring = false
       rescue Selenium::WebDriver::Error::StaleElementReferenceError
@@ -126,3 +129,5 @@ end
 binding.pry
 
 driver.quit
+
+# jQuery("div.site-label-text:contains(111)").parent().prev().click()
