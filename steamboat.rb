@@ -45,7 +45,7 @@ class Steamboat
   def navigate
     begin
       driver.switch_to.window(tab)
-      map_id = campground.downcase == "sage" ? "-2147483552" : "-2147483489"
+      map_id = campground.downcase == "sage" ? "-2147483490" : "-2147483489"
       the_url = "https://washington.goingtocamp.com/create-booking/results?resourceLocationId=-2147483552&mapId=#{map_id}&searchTabGroupId=0&bookingCategoryId=0&startDate=2021-#{start_date.strftime("%m")}-#{start_date.strftime("%d")}T00:00:00.000Z&endDate=2021-#{end_date.strftime("%m")}-#{end_date.strftime("%d")}T00:00:00.000Z&nights=#{NUMBER_OF_NIGHTS}&isReserving=true&equipmentId=-32768&subEquipmentId=-32762&partySize=5"
       driver.get the_url
 
