@@ -28,7 +28,7 @@ require 'time'
 class Steamboat
 
   NUMBER_OF_TABS = 22
-  NUMBER_OF_NIGHTS = 5
+  NUMBER_OF_NIGHTS = 6
 
   attr_accessor :campground, :driver, :instance_number, :site, :tab, :test_run, :wait_long
 
