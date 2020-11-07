@@ -55,7 +55,8 @@ class Steamboat
         driver.find_element(:id, "consentButton").click
       end
 
-      wait_long.until { driver.find_element(:xpath, "//*[text()='#{site}']").enabled? }
+      # wait_long.until { driver.find_element(:xpath, "//*[text()='#{site}']").enabled? }
+      sleep 3
       element = driver.find_element(:xpath, "//*[text()='#{site}']")
       driver.execute_script("arguments[0].scrollIntoView();",element)
 
